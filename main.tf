@@ -27,16 +27,6 @@ module "gke" {
   nodes_min                     = var.nodes_min
 }
 
-module "argocd" {
-  source                        = "./modules/argocd/"
-  cluster_name                  = module.gke.cluster_name #generate GKE dependency
-  project_id                    = var.project_id
-  env                           = var.env
-  region                        = var.region
-  argocd_ip_name                = module.networking.argocd_ip_name
-  argocd_ip                     = module.networking.argocd_ip_address
-}
-
 module "databases" {
   source                        = "./modules/databases/"
   project_id                    = var.project_id
@@ -69,17 +59,4 @@ module "artifact_registry" {
   repository_name = var.repository_name
 }
 
-module "cloud_build" {
-  source                        = "./modules/cloud-build/"
-  db_host                       = module.databases.ip_address_mysql
-  redis_host                    = module.databases.ip_address_redis
-  project_id                    = var.project_id
-  repo_name                     = module.artifact_registry.repository_id
-  cluster_name                  = module.gke.cluster_name
-  region                        = var.region
-  origin_branch                 = var.origin_branch
-  repo_password                 = var.repo_password
-  ip_socks_shop                 = module.networking.address_socks_shop
-  cloud_source_repo             = var.cloud_source_repo
-}
 
